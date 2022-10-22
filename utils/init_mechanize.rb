@@ -5,11 +5,9 @@ module InitMechanize
     
     module_function
 
-    def init_mechanize(options = {})
+	def init_mechanize(options = {})
         @utils_mechanize_options = options
-        @logs = []
-        @debug = false
-        @list_time = []
+        
         @mechanize = Mechanize.new do |a|
             a.user_agent_alias = ['Windows Mozilla', 'Windows IE 9', 'Windows IE 10', 'Windows IE 11', 'Windows Firefox', 'Mac Firefox', 'Linux Firefox'].sample
             a.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -20,10 +18,8 @@ module InitMechanize
     def post(request)
 		init_mechanize
 		@request = request
-		# check_limits
 		page = @mechanize.post(request.url, request.params, request.options)
-		# enqueue_log(request, 'POST', page) rescue nil
-		# debug_log(request, page)
+		debug_log(request, page) rescue nil
 		page
 	end
 
@@ -31,9 +27,14 @@ module InitMechanize
 		init_mechanize
 		@request = request
 		page = @mechanize.get(request.url, request.params, nil, request.options)
-		# enqueue_log(request, 'GET', page)  rescue nil
-		# debug_log(request, page)
+		debug_log(request, page) rescue nil
 		page
+	end
+
+	def debug_log(request, page)
+		filename = "log/#{ Time.now.to_i }-#{request.description}"
+		( File.open("#{filename}.json", 'w') << {url: request.url, params: request.params, options: request.options} ).close_write
+		page.save("#{filename}.html")
 	end
 
     

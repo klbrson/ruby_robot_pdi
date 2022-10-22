@@ -3,10 +3,10 @@ require "movie"
 require 'pry'
 
 describe Movie do
-    it "should be valid status" do
-        params = {
-            day: 18
-        }
-        Movie.initialize(params)
-    end
+	it "should be valid status" do
+		params = OpenStruct.new(day: 28)
+		movie = Movie.new(params)
+		 
+		expect(movie.result.status).to eql('OK')
+	end
 end

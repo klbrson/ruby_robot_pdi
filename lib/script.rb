@@ -26,9 +26,10 @@ File.write('log/home_page.html', home_page.body)
 html_page = Nokogiri::HTML home_page.body
 movies = html_page.search('div[id="cycleMovies"] a')[3]
 movie_url =  movies.attr('href')
+movie_id = $1 if movies.attr('href') =~ /=(.*)/
 
 #GET detail
-movie_detail = agent.get "https://www.cinemaxbeltrao.com.br/#{movie_url}"
+movie_detail = agent.get "https://www.cinemaxbeltrao.com.br/detalhes.php?filme=#{movie_id}"
 File.write('log/movie_detail.html', movie_detail.body)
 movie_detail = Nokogiri::HTML movie_detail.body
 
@@ -49,7 +50,7 @@ end
 # create params 
 params = {
     'data'=> days['13'],
-    'cartaz'=> '73'
+    'cartaz'=> movie_id
 }
 
 session = agent.post('https://www.cinemaxbeltrao.com.br/getSessao.php', params, {})
